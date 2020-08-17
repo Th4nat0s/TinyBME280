@@ -1,0 +1,21 @@
+#######################################
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+BME280setI2Caddress KEYWORD2
+BME280setup
+BME280temperature KEYWORD2
+BME280pressure
+BME280humidity
+readTemperature    KEYWORD2
+readPressure    KEYWORD2
+readAltitude    KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
