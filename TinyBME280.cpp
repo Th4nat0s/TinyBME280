@@ -16,13 +16,13 @@ int BME280address = 118;
 
 int16_t read16 () {
   uint8_t lo, hi;
-  lo = Wire.read(); hi = Wire.read();
+  lo = TinyWireM.read(); hi = TinyWireM.read();
   return hi<<8 | lo;
 }
 
 int32_t read32 () {
   uint8_t msb, lsb, xlsb;
-  msb = Wire.read(); lsb = Wire.read(); xlsb = Wire.read();
+  msb = TinyWireM.read(); lsb = TinyWireM.read(); xlsb = TinyWireM.read();
   return (uint32_t)msb<<12 | (uint32_t)lsb<<4 | (xlsb>>4 & 0x0F);
 }
 
@@ -35,30 +35,30 @@ void BME280setI2Caddress (uint8_t address) {
 void BME280setup () {
   delay(2);
   // Set the mode to Normal, no upsampling
-  Wire.beginTransmission(BME280address);
-  Wire.write(0xF2);                             // ctrl_hum
-  Wire.write(0b00000001);
-  Wire.write(0xF4);                             // ctrl_meas
-  Wire.write(0b00100111);
+  TinyWireM.beginTransmission(BME280address);
+  TinyWireM.write(0xF2);                             // ctrl_hum
+  TinyWireM.write(0b00000001);
+  TinyWireM.write(0xF4);                             // ctrl_meas
+  TinyWireM.write(0b00100111);
   // Read the chip calibrations.
-  Wire.write(0x88);
-  Wire.endTransmission();
-  Wire.requestFrom(BME280address, 26);
+  TinyWireM.write(0x88);
+  TinyWireM.endTransmission();
+  TinyWireM.requestFrom(BME280address, 26);
   for (int i=1; i<=3; i++) T[i] = read16();     // Temperature
   for (int i=1; i<=9; i++) P[i] = read16();     // Pressure
-  Wire.read();  // Skip 0xA0
-  H[1] = (uint8_t)Wire.read();                  // Humidity
+  TinyWireM.read();  // Skip 0xA0
+  H[1] = (uint8_t)TinyWireM.read();                  // Humidity
   //
-  Wire.beginTransmission(BME280address);
-  Wire.write(0xE1);
-  Wire.endTransmission();
-  Wire.requestFrom(BME280address, 7);
+  TinyWireM.beginTransmission(BME280address);
+  TinyWireM.write(0xE1);
+  TinyWireM.endTransmission();
+  TinyWireM.requestFrom(BME280address, 7);
   H[2] = read16();
-  H[3] = (uint8_t)Wire.read();
-  uint8_t e4 = Wire.read(); uint8_t e5 = Wire.read();
+  H[3] = (uint8_t)TinyWireM.read();
+  uint8_t e4 = TinyWireM.read(); uint8_t e5 = TinyWireM.read();
   H[4] = ((int16_t)((e4 << 4) + (e5 & 0x0F)));
-  H[5] = ((int16_t)((Wire.read() << 4) + ((e5 >> 4) & 0x0F)));
-  H[6] = ((int8_t)Wire.read()); // 0xE7
+  H[5] = ((int16_t)((TinyWireM.read() << 4) + ((e5 >> 4) & 0x0F)));
+  H[6] = ((int8_t)TinyWireM.read()); // 0xE7
   // Read the temperature to set BME280t_fine
   BME280temperature();
 }
@@ -66,10 +66,10 @@ void BME280setup () {
 // Returns temperature in DegC, resolution is 0.01 DegC
 // Output value of “5123” equals 51.23 DegC
 int32_t BME280temperature () {
-  Wire.beginTransmission(BME280address);
-  Wire.write(0xFA);
-  Wire.endTransmission();
-  Wire.requestFrom(BME280address, 3);
+  TinyWireM.beginTransmission(BME280address);
+  TinyWireM.write(0xFA);
+  TinyWireM.endTransmission();
+  TinyWireM.requestFrom(BME280address, 3);
   int32_t adc = read32();
   // Compensate
   int32_t var1, var2, t; 
@@ -83,10 +83,10 @@ int32_t BME280temperature () {
 // Returns pressure in Pa as unsigned 32 bit integer
 // Output value of “96386” equals 96386 Pa = 963.86 hPa
 uint32_t BME280pressure () {
-  Wire.beginTransmission(BME280address);
-  Wire.write(0xF7);
-  Wire.endTransmission();
-  Wire.requestFrom(BME280address, 3);
+  TinyWireM.beginTransmission(BME280address);
+  TinyWireM.write(0xF7);
+  TinyWireM.endTransmission();
+  TinyWireM.requestFrom(BME280address, 3);
   int32_t adc = read32();
   // Compensate
   int32_t var1, var2;
@@ -110,11 +110,11 @@ uint32_t BME280pressure () {
 // Humidity in %RH, resolution is 0.01%RH
 // Output value of “4653” represents 46.53 %RH
 uint32_t BME280humidity () {
-  Wire.beginTransmission(BME280address);
-  Wire.write(0xFD);
-  Wire.endTransmission();
-  Wire.requestFrom(BME280address, 2);
-  uint8_t hi = Wire.read(); uint8_t lo = Wire.read();
+  TinyWireM.beginTransmission(BME280address);
+  TinyWireM.write(0xFD);
+  TinyWireM.endTransmission();
+  TinyWireM.requestFrom(BME280address, 2);
+  uint8_t hi = TinyWireM.read(); uint8_t lo = TinyWireM.read();
   int32_t adc = (uint16_t)(hi<<8 | lo);
   // Compensate
   int32_t var1; 

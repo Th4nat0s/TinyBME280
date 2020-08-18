@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <Arduino.h>
-#include <Wire.h>
+#include <TinyWireM.h>
 
 #ifndef TINYBME280
 #define TINYBME280
